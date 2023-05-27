@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "521448843417",
+    "project_id": "karyana-ae153",
+    "storage_bucket": "karyana-ae153.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521448843417:android:5ffd36f95cfedb6dbab008",
+        "android_client_info": {
+          "package_name": "com.example.karyana"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521448843417-51bl4hcm0l07b2uetclf9nson4ekoalp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKzRUOhxAdozoFz6s7aYI8tJDW0mhjxAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521448843417-51bl4hcm0l07b2uetclf9nson4ekoalp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
