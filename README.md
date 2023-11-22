@@ -1,6 +1,5 @@
-![karyana Main](https://github.com/technocrats-portfolio/KARYANA/assets/149525727/327e8496-090b-4b98-b385-f055f3a4cb83)
-
 <p align="center">
+  <img src="https://github.com/technocrats-portfolio/KARYANA/assets/149525727/327e8496-090b-4b98-b385-f055f3a4cb83">
   <h3 align="center">KARYANA E-Commerce Application</h3>
   <p align="center">
     Simple Flutter application with focus on backend/firebase. Everything is stored and fetched from firebase. This includes images, products and anything else you might see in the application.
