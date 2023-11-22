@@ -1,4 +1,5 @@
-![Jayz Main](https://github.com/technocrats-portfolio/Jayz_App/assets/149525727/132c1d77-025c-41cd-85be-33612b4faaa3)
+![karyana Main](https://github.com/technocrats-portfolio/KARYANA/assets/149525727/327e8496-090b-4b98-b385-f055f3a4cb83)
+
 <p align="center">
   <h3 align="center">KARYANA E-Commerce Application</h3>
   <p align="center">
