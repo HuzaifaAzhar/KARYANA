@@ -53,7 +53,7 @@ Have a bug or a feature request? Please first read the [issues](https://github.c
 
 - <https://github.com/HuzaifaAzhar/>
 
-  **Sohaib Asif**
+**Sohaib Asif**
   
 - <https://github.com/SohaibAsif-5602/>
 
