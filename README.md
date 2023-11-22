@@ -75,6 +75,6 @@ Thanks to all contributors and their support:
 
 ## Copyright and license
 
-Code and documentation copyright 2018 the authors. Code released under the [MIT License](https://github.com/Ismaestro/flutter-example-app/blob/master/LICENSE).
+Code and documentation copyright 2023 the authors. Code released under the [GNU 3](https://github.com/technocrats-portfolio/KARYANA/blob/main/README.md).
 
 Enjoy :metal:
