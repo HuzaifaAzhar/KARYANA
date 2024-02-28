@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'listview.dart';
+import 'categories.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'homepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'main.dart';
 //
 // class Cart {
 //   List<Product> _items = [];
@@ -67,7 +68,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 // }
 class Cart {
   List<Product> _items = [];
-  void addToCart(Product product) {
+  void addToCart(Product product) async {
     int index = _items.indexWhere((p) => p.name == product.name);
     if (index >= 0) {
       // If the product is already in the cart, increment its quantity
@@ -87,6 +88,15 @@ class Cart {
         return;
       }
     }
+    final CollectionReference _collectionReference =
+    FirebaseFirestore.instance.collection('products');
+    final DocumentSnapshot doc =
+        await _collectionReference.doc(product.id).get();
+    final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    final Sold = data['Sold'] ?? 0;
+    _collectionReference.doc(product.id).update({
+      'Sold': Sold + 1,
+    });
   }
 
   double get totalPrice {
@@ -105,7 +115,7 @@ class Cart {
 class CartPage extends StatefulWidget {
   final Cart cart;
 
-  CartPage({required this.cart});
+  const CartPage({super.key, required this.cart});
 
   @override
   _CartPageState createState() => _CartPageState();
@@ -115,6 +125,7 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: getBackground(context),
       body: ListView.builder(
         itemCount: widget.cart.items.length,
         itemBuilder: (BuildContext context, int index) {
@@ -154,8 +165,10 @@ class _CartPageState extends State<CartPage> {
                       await _collectionReference.doc(product.id).get();
                       final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
                       final stockQnt = data['Stock qnt'];
+                      final Sold=data['Sold']??0;
                       _collectionReference.doc(product.id).update({
                         'Stock qnt': stockQnt + 1,
+                        'Sold':Sold-1,
                       });
                     } else {
                       product.quantity--;
@@ -168,8 +181,10 @@ class _CartPageState extends State<CartPage> {
                       await _collectionReference.doc(product.id).get();
                       final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
                       final stockQnt = data['Stock qnt'];
+                      final Sold=data['Sold']??0;
                       _collectionReference.doc(product.id).update({
                         'Stock qnt': stockQnt + 1,
+                        'Sold':Sold-1,
                       });
                     }
                     setState(() {});
@@ -188,37 +203,79 @@ class _CartPageState extends State<CartPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Total Price: ${widget.cart.totalPrice}'),
-              ElevatedButton(
-                onPressed: () async {
-                  // Create a new transaction document in the database
-                  final CollectionReference _transactionsCollectionReference =
-                  FirebaseFirestore.instance.collection('transactions');
-                  final FirebaseAuth _auth = FirebaseAuth.instance;
-                  final User? user = _auth.currentUser;
-                  final String? userId = user?.uid;
-                  final transactionDocRef = await _transactionsCollectionReference.add({
-                    'user_id': userId,
-                    'timestamp': FieldValue.serverTimestamp(),
-                    'total_price': widget.cart.totalPrice,
-                    'items': widget.cart.items.map((product) => {
-                      'id': product.id,
-                      'quantity': product.quantity,
-                    }).toList(),
-                  });
-
-                  // Clear the cart and navigate to the home page
-                  widget.cart.clear();
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                        (route) => false,
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Purchase confirmed!')),
-                  );
-                },
-                child: const Text('Checkout'),
-              ),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Create a new transaction document in the database
+                    if(widget.cart.items.isNotEmpty){
+                    final CollectionReference _transactionsCollectionReference =
+                    FirebaseFirestore.instance.collection('transactions');
+                    final FirebaseAuth auth = FirebaseAuth.instance;
+                    final User? user = auth.currentUser;
+                    final String? userId = user?.uid;
+                    final transactionDocRef = await _transactionsCollectionReference
+                        .add({
+                      'user_id': userId,
+                      'timestamp': FieldValue.serverTimestamp(),
+                      'total_price': widget.cart.totalPrice,
+                      'items': widget.cart.items.map((product) =>
+                      {
+                        'id': product.id,
+                        'name':product.name,
+                        'quantity': product.quantity,
+                      }).toList(),
+                    });
+                    // Clear the cart and navigate to the home page
+                    widget.cart.clear();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const HomePage()),
+                          (route) => false,
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Transaction completed successfully')),
+                    );
+                  }
+                    else{
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Cart is empty')),
+                      );
+                    }
+                    },
+                  child: const Text('Checkout'),
+                ),
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     // Create a new transaction document in the database
+              //     final CollectionReference _transactionsCollectionReference =
+              //     FirebaseFirestore.instance.collection('transactions');
+              //     final FirebaseAuth _auth = FirebaseAuth.instance;
+              //     final User? user = _auth.currentUser;
+              //     final String? userId = user?.uid;
+              //     final transactionDocRef = await _transactionsCollectionReference.add({
+              //       'user_id': userId,
+              //       'timestamp': FieldValue.serverTimestamp(),
+              //       'total_price': widget.cart.totalPrice,
+              //       'items': widget.cart.items.map((product) => {
+              //         'id': product.id,
+              //         'quantity': product.quantity,
+              //       }).toList(),
+              //     });
+              //
+              //     // Clear the cart and navigate to the home page
+              //     widget.cart.clear();
+              //     Navigator.pushAndRemoveUntil(
+              //       context,
+              //       MaterialPageRoute(builder: (context) => const HomePage()),
+              //           (route) => false,
+              //     );
+              //     ScaffoldMessenger.of(context).showSnackBar(
+              //       const SnackBar(content: Text('Purchase confirmed!')),
+              //     );
+              //   },
+              //   child: const Text('Checkout'),
+              // ),
             ],
           ),
         ),

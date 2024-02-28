@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'main.dart';
 
 class FavoritesPage extends StatelessWidget {
   final CollectionReference _collectionReference =
   FirebaseFirestore.instance.collection('favorites');
 
-  FavoritesPage();
+  FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +20,7 @@ class FavoritesPage extends StatelessWidget {
     final String userId = user.uid;
 
     return Scaffold(
+      backgroundColor: getBackground(context),
       body: StreamBuilder<QuerySnapshot>(
         stream: _collectionReference
             .where('userId', isEqualTo: userId)
@@ -92,7 +94,7 @@ class FavoritesPage extends StatelessWidget {
     );
   }
 
-  static Future<void> addToFavorites(String productId) async {
+  Future<void> addToFavorites(String productId) async {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {

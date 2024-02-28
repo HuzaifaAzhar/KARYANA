@@ -2,8 +2,11 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'homepage.dart';
+import 'main.dart';
 
 class EnterUserDataScreen extends StatefulWidget {
   const EnterUserDataScreen({Key? key}) : super(key: key);
@@ -23,7 +26,11 @@ class _EnterUserDataScreenState extends State<EnterUserDataScreen> {
     final pickedFile = await ImagePicker().pickImage(source: source);
 
     setState(() {
+      if (kIsWeb) {
+      _imageFile =  Image.network(pickedFile!.path) as File?;
+      } else {
       _imageFile = File(pickedFile!.path);
+      }
     });
   }
 
@@ -59,8 +66,9 @@ class _EnterUserDataScreenState extends State<EnterUserDataScreen> {
   Widget build(BuildContext context) {
     final uid = FirebaseAuth.instance.currentUser!.uid;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Enter User Data'),
+      backgroundColor: getBackground(context),
+       appBar: AppBar(
+         title: const Text('Enter User Data'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -79,6 +87,7 @@ class _EnterUserDataScreenState extends State<EnterUserDataScreen> {
                   builder: (context) => Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (!kIsWeb)
                       ListTile(
                         leading: const Icon(Icons.camera_alt),
                         title: const Text('Take a picture'),
@@ -150,7 +159,10 @@ class _EnterUserDataScreenState extends State<EnterUserDataScreen> {
                     'contact': contact,
                   });
                   await _uploadProfilePicture();
-                  Navigator.pop(context);
+                  { Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                  );}
                 },
                 child: const Text('Submit'),
               ),
@@ -160,7 +172,6 @@ class _EnterUserDataScreenState extends State<EnterUserDataScreen> {
       ),
     );
   }
-
 }
 
 
