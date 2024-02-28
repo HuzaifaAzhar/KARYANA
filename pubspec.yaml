@@ -79,7 +79,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/Images/
+    - assets/Images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -94,14 +94,14 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-     - family: SFPRODISPLAY
-       fonts:
-         - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
-         - asset: assets/fonts/SFPRODISPLAYBOLD.OTF
-           weight: 700
-     - family: Baloo
-       fonts:
-         - asset: assets/fonts/BALOOREGULAR.TTF
+    - family: SFPRODISPLAY
+      fonts:
+        - asset: assets/fonts/SFPRODISPLAYREGULAR.OTF
+        - asset: assets/fonts/SFPRODISPLAYBOLD.OTF
+          weight: 700
+    - family: Baloo
+      fonts:
+        - asset: assets/fonts/BALOOREGULAR.TTF
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:

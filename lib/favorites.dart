@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'main.dart';
 
 class FavoritesPage extends StatelessWidget {
   final CollectionReference _collectionReference =
-  FirebaseFirestore.instance.collection('favorites');
+      FirebaseFirestore.instance.collection('favorites');
 
   FavoritesPage({super.key});
 
@@ -14,7 +15,8 @@ class FavoritesPage extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return const Center(child: Text('You must be logged in to view favorites.'));
+      return const Center(
+          child: Text('You must be logged in to view favorites.'));
     }
 
     final String userId = user.uid;
@@ -22,11 +24,9 @@ class FavoritesPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: getBackground(context),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _collectionReference
-            .where('userId', isEqualTo: userId)
-            .snapshots(),
-        builder:
-            (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        stream:
+            _collectionReference.where('userId', isEqualTo: userId).snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Text('Something went wrong');
           }
@@ -44,7 +44,7 @@ class FavoritesPage extends StatelessWidget {
             itemCount: documents.length,
             itemBuilder: (BuildContext context, int index) {
               Map<String, dynamic>? favoriteData =
-              documents[index].data() as Map<String, dynamic>?;
+                  documents[index].data() as Map<String, dynamic>?;
               if (favoriteData == null) {
                 return const SizedBox.shrink();
               }
@@ -66,9 +66,11 @@ class FavoritesPage extends StatelessWidget {
                   }
 
                   Map<String, dynamic>? productData =
-                  productSnapshot.data!.data() as Map<String, dynamic>?;
+                      productSnapshot.data!.data() as Map<String, dynamic>?;
                   if (productData == null) {
-                    return const Center(child:Text('No Items in Favorites!'),);
+                    return const Center(
+                      child: Text('No Items in Favorites!'),
+                    );
                   }
                   return ListTile(
                     leading: SizedBox(
@@ -104,7 +106,7 @@ class FavoritesPage extends StatelessWidget {
     final String userId = user.uid;
 
     CollectionReference favoritesReference =
-    FirebaseFirestore.instance.collection('favorites');
+        FirebaseFirestore.instance.collection('favorites');
     QuerySnapshot favoritesQuery = await favoritesReference
         .where('productId', isEqualTo: productId)
         .where('userId', isEqualTo: userId)

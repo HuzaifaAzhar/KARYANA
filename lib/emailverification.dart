@@ -1,9 +1,11 @@
 import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
+
 import 'homepage.dart';
+import 'main.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -16,6 +18,7 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool isEmailVerified = false;
   Timer? timer;
+
   @override
   void initState() {
     super.initState();
@@ -33,19 +36,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     });
 
     if (isEmailVerified) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Email Successfully Verified")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Email Successfully Verified")));
       timer?.cancel();
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('isLoggedIn', true);
       showSnackbar(context, 'User is signed in!');
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx)=>const HomePage()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (ctx) => const HomePage()));
     }
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     timer?.cancel();
     super.dispose();
   }
@@ -84,9 +87,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Center(child: CircularProgressIndicator(
-              //  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), backgroundColor: Colors.grey,
-              )),
+              const Center(child: CircularProgressIndicator()),
               const SizedBox(height: 8),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32.0),
@@ -94,26 +95,29 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   child: Text(
                     'Verifying email...',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16,),
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 57),
               Padding(
-                padding: const EdgeInsets
-                    .symmetric(horizontal: 32.0),
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: ElevatedButton(
                   child: const Text('Resend'),
                   onPressed: () {
                     try {
-                      FirebaseAuth.instance.currentUser?.sendEmailVerification();
+                      FirebaseAuth.instance.currentUser
+                          ?.sendEmailVerification();
                     } on FirebaseAuthException catch (e) {
                       if (e.code == 'too-many-requests') {
                         ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Firebase: We have blocked all requests from this device due to unusual activity. Try again later.'),
-                          duration: Duration(seconds: 3),
-                        ),
+                          const SnackBar(
+                            content: Text(
+                                'Firebase: We have blocked all requests from this device due to unusual activity. Try again later.'),
+                            duration: Duration(seconds: 3),
+                          ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -125,10 +129,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       }
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(e.toString()),
-                        duration: const Duration(seconds: 3),
-                      ),
+                        SnackBar(
+                          content: Text(e.toString()),
+                          duration: const Duration(seconds: 3),
+                        ),
                       );
                     }
                   },
