@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'main.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -10,7 +11,8 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  final TextEditingController _currentPasswordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   String _message = '';
 
@@ -23,15 +25,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     });
   }
 
-  Future<String> changePassword(String currentPassword, String newPassword) async {
+  Future<String> changePassword(
+      String currentPassword, String newPassword) async {
     try {
-      // First, re-authenticate the user with their current email and password
       final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
       final User user = firebaseAuth.currentUser!;
-      final credentials = EmailAuthProvider.credential(email: user.email.toString(), password: currentPassword);
+      final credentials = EmailAuthProvider.credential(
+          email: user.email.toString(), password: currentPassword);
       await user.reauthenticateWithCredential(credentials);
 
-      // Change the user's password
       await user.updatePassword(newPassword);
       return "Password changed successfully!";
     } catch (e) {
@@ -52,13 +54,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(width: 300,
+              SizedBox(
+                width: 300,
                 child: TextField(
                   controller: _currentPasswordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius:  BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     prefixIcon: const Icon(Icons.lock_outlined),
                     labelText: 'Current Password',
@@ -67,13 +70,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
               ),
               const SizedBox(height: 20.0),
-              SizedBox(width: 300,
+              SizedBox(
+                width: 300,
                 child: TextField(
                   controller: _newPasswordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
-                      borderRadius:  BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     prefixIcon: const Icon(Icons.lock_reset_outlined),
                     labelText: 'New Password',
@@ -82,12 +86,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 ),
               ),
               const SizedBox(height: 20.0),
-              SizedBox(height: 40,width: 120,
+              SizedBox(
+                height: 40,
+                width: 120,
                 child: ElevatedButton(
                   onPressed: _changePassword,
                   style: ElevatedButton.styleFrom(shape: const StadiumBorder()),
-                  child: const Text('Change Password',
-                    textAlign: TextAlign.center,),
+                  child: const Text(
+                    'Change Password',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
               const SizedBox(height: 20.0),

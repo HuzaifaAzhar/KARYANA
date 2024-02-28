@@ -1,206 +1,234 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:karyana/settings.dart';
-import 'package:provider/provider.dart';
-import 'categories.dart';
-import 'package:karyana/productdetails.dart';
-import 'homepage.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:karyana/productdetails.dart';
+
+import 'categories.dart';
+import 'homepage.dart';
 import 'main.dart';
 
 class displayProducts extends StatefulWidget {
   final String selectedCategory;
-  const displayProducts({required this.selectedCategory,Key? key}) : super(key: key);
+
+  const displayProducts({required this.selectedCategory, Key? key})
+      : super(key: key);
 
   @override
-  State<displayProducts> createState() => _displayProductsState(selectedCategory);
+  State<displayProducts> createState() =>
+      _displayProductsState(selectedCategory);
 }
 
 class _displayProductsState extends State<displayProducts> {
-  String _selectedCategory='';
-  String pageTitle='';
-  _displayProductsState(String selectedCategory)
-  {
-    _selectedCategory=selectedCategory;
-    if(_selectedCategory==('')){pageTitle='All Products:';}
-    else{pageTitle=('$_selectedCategory:');}
+  String _selectedCategory = '';
+  String pageTitle = '';
+
+  _displayProductsState(String selectedCategory) {
+    _selectedCategory = selectedCategory;
+    if (_selectedCategory == ('')) {
+      pageTitle = 'All Products:';
+    } else {
+      pageTitle = ('$_selectedCategory:');
+    }
   }
+
   final CollectionReference _collectionReference =
-  FirebaseFirestore.instance.collection('products');
+      FirebaseFirestore.instance.collection('products');
   List<Product> filteredProducts = [];
+
   @override
   void initState() {
     super.initState();
     _searchController.addListener(filterProducts);
   }
+
   TextEditingController _searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text('$pageTitle'),
         ),
-      backgroundColor: getBackground(context),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 16,),
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    // Perform the search here
-                    filterProducts();
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.0),
+        backgroundColor: getBackground(context),
+        body: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () {
+                      filterProducts();
+                    },
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
                       ),
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              if (_searchController.text == '')
+                const Text(
+                  'Top Selling Products',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFC49000),
+                  ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16,),
-            if(_searchController.text=='')
-            const Text(
-              'Top Selling Products',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Color(0xFFC49000),),
-            ),
-            if(_searchController.text=='')
-            const SizedBox(height: 10,),
-            if(_searchController.text=='')
-            Container(
-              child: buildTopSoldProductsCarousel(),
-            ),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _selectedCategory.isNotEmpty
-                    ? _collectionReference
-                    .where('Category', isEqualTo: _selectedCategory)
-                    .snapshots()
-                    : _collectionReference.snapshots(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text('Something went wrong');
-                  }
+              if (_searchController.text == '')
+                const SizedBox(
+                  height: 10,
+                ),
+              if (_searchController.text == '')
+                Container(
+                  child: buildTopSoldProductsCarousel(),
+                ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: _selectedCategory.isNotEmpty
+                      ? _collectionReference
+                          .where('Category', isEqualTo: _selectedCategory)
+                          .snapshots()
+                      : _collectionReference.snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return const Text('Something went wrong');
+                    }
 
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                  List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
-                  if (_searchController.text.isEmpty) {
-                    filteredProducts = documents.map((document) {
-                      Map<String, dynamic> productData =
-                      document.data() as Map<String, dynamic>;
-                      return Product(
-                        id: document.id,
-                        name: productData['Name'],
-                        category: productData['Category'],
-                        stockQnt: productData['Stock qnt'],
-                        price: productData['Price'],
-                        pdesc: productData['Pdesc'],
-                        pic: productData['Pic'],
-                        sold: productData['Sold'],
-                      );
-                    }).toList();
-                  }
-                  return ListView.builder(
-                    itemCount: filteredProducts.length,
-                    itemBuilder: (BuildContext context, int index) {
-
-                      Product product = filteredProducts[index];
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: getBorder(context)),
-                            color: getBorderBG(context),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ProductDetailsPage(product: product, cart: mycart),
+                    List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
+                    if (_searchController.text.isEmpty) {
+                      filteredProducts = documents.map((document) {
+                        Map<String, dynamic> productData =
+                            document.data() as Map<String, dynamic>;
+                        return Product(
+                          id: document.id,
+                          name: productData['Name'],
+                          category: productData['Category'],
+                          stockQnt: productData['Stock qnt'],
+                          price: productData['Price'],
+                          pdesc: productData['Pdesc'],
+                          pic: productData['Pic'],
+                          sold: productData['Sold'],
+                        );
+                      }).toList();
+                    }
+                    return ListView.builder(
+                      itemCount: filteredProducts.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Product product = filteredProducts[index];
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 5, 20, 5),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: getBorder(context)),
+                              color: getBorderBG(context),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProductDetailsPage(
+                                                  product: product,
+                                                  cart: mycart),
+                                        ),
+                                      );
+                                    },
+                                    child: SizedBox(
+                                      width: 90,
+                                      height: 90,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          bottomLeft: Radius.circular(20),
+                                        ),
+                                        child: Image.network(product.pic),
                                       ),
-                                    );
-                                  },
-                                  child: SizedBox(
-                                    width: 90,
-                                    height: 90,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(20),
-                                        bottomLeft: Radius.circular(20),
-                                      ),
-                                      child: Image.network(product.pic),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(product.name, style: const TextStyle(fontSize: 18)),
-                                        Text('Quantity: ${product.stockQnt}'),
-                                        Text('Price: ${product.price}'),
-                                      ],
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(product.name,
+                                              style: const TextStyle(
+                                                  fontSize: 18)),
+                                          Text('Quantity: ${product.stockQnt}'),
+                                          Text('Price: ${product.price}'),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                product.stockQnt > 0
-                                    ? IconButton(
-                                  icon: const Icon(Icons.add_shopping_cart),
-                                  onPressed: () {
-                                    _collectionReference.doc(product.id).update({
-                                      'Stock qnt': product.stockQnt - 1,
-                                    });
-                                    mycart.addToCart(product);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Added to cart'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  },
-                                )
-                                    : const Text(
-                                  'Out of Stock',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ],
+                                  product.stockQnt > 0
+                                      ? IconButton(
+                                          icon: const Icon(
+                                              Icons.add_shopping_cart),
+                                          onPressed: () {
+                                            _collectionReference
+                                                .doc(product.id)
+                                                .update({
+                                              'Stock qnt': product.stockQnt - 1,
+                                            });
+                                            mycart.addToCart(product);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Added to cart'),
+                                                duration: Duration(seconds: 2),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      : const Text(
+                                          'Out of Stock',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-
-          ],
-        ),
-      )
-    );
+            ],
+          ),
+        ));
   }
+
   void filterProducts() {
     String query = _searchController.text.toString();
 
@@ -213,7 +241,7 @@ class _displayProductsState extends State<displayProducts> {
         List<QueryDocumentSnapshot> documents = querySnapshot.docs;
         List<Product> searchResults = documents.map((document) {
           Map<String, dynamic> productData =
-          document.data() as Map<String, dynamic>;
+              document.data() as Map<String, dynamic>;
           return Product(
             id: document.id,
             name: productData['Name'],
@@ -236,6 +264,7 @@ class _displayProductsState extends State<displayProducts> {
       }
     });
   }
+
   String formatSearchQuery(String query) {
     if (query.isEmpty) {
       return '';
@@ -244,12 +273,13 @@ class _displayProductsState extends State<displayProducts> {
     List<String> words = query.split(' ');
     for (int i = 0; i < words.length; i++) {
       if (words[i].isNotEmpty) {
-        words[i] = words[i][0].toUpperCase() +
-            words[i].substring(1).toLowerCase();
+        words[i] =
+            words[i][0].toUpperCase() + words[i].substring(1).toLowerCase();
       }
     }
     return words.join('');
   }
+
   Widget buildTopSoldProductsCarousel() {
     return FutureBuilder<QuerySnapshot<Map<String, dynamic>>>(
       future: FirebaseFirestore.instance
@@ -260,12 +290,11 @@ class _displayProductsState extends State<displayProducts> {
       builder: (BuildContext context,
           AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // While waiting for the data to load, you can show a loading indicator or placeholder image.
-          return const SizedBox(width:50,height:50,child: CircularProgressIndicator());
+          return const SizedBox(
+              width: 50, height: 50, child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
-          // If an error occurred while fetching the data, you can handle it here.
           return Text('Error: ${snapshot.error}');
         }
 
@@ -273,21 +302,20 @@ class _displayProductsState extends State<displayProducts> {
             snapshot.data!.docs;
 
         if (documents.isEmpty) {
-          // Handle the case when no top sold products are found.
           return const Text('No top sold products found');
         }
 
         return CarouselSlider(
           options: CarouselOptions(
             autoPlayInterval: const Duration(seconds: 1),
-            autoPlayAnimationDuration: const Duration(milliseconds: 800), // Adjust the animation duration as needed
-            autoPlayCurve: Curves.easeInOut, // Adjust the animation curve as needed
+            autoPlayAnimationDuration: const Duration(milliseconds: 800),
+            autoPlayCurve: Curves.easeInOut,
             enlargeCenterPage: true,
             autoPlay: false,
-            height: 145, // Adjust the height as needed
-            enableInfiniteScroll: true, // Enable infinite scrolling
-            viewportFraction: 0.4, // Adjust the fraction to control the number of visible categories
-            initialPage: 0, // Set the initial page index
+            height: 145,
+            enableInfiniteScroll: true,
+            viewportFraction: 0.4,
+            initialPage: 0,
             scrollDirection: Axis.horizontal,
           ),
           items: documents.map((doc) {
@@ -306,7 +334,8 @@ class _displayProductsState extends State<displayProducts> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProductDetailsPage(product: product, cart: mycart),
+                    builder: (context) =>
+                        ProductDetailsPage(product: product, cart: mycart),
                   ),
                 );
               },
@@ -317,8 +346,10 @@ class _displayProductsState extends State<displayProducts> {
                     Container(
                       width: 105,
                       height: 105,
-                      child: CircleAvatar(backgroundImage: NetworkImage(product.pic),radius: 40,),
-                      //Image.network(product.pic),
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(product.pic),
+                        radius: 40,
+                      ),
                     ),
                     Text(product.name),
                   ],

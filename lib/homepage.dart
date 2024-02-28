@@ -4,16 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:karyana/changepassword.dart';
 import 'package:karyana/feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'categories.dart';
-import 'profile.dart';
+
 import 'cart.dart';
+import 'categories.dart';
 import 'favorites.dart';
+import 'main.dart';
+import 'profile.dart';
+import 'settings.dart';
 import 'transactions.dart';
 import 'userentry.dart';
-import 'main.dart';
-import 'settings.dart';
 
-class HomePage extends StatefulWidget{
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   int myindex = 2;
 
   DarkModeProvider darkModeProvider = DarkModeProvider();
+
   Future<String?> getProfilePictureUrl() async {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
@@ -52,18 +54,9 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         toolbarHeight: 45,
-        //automaticallyImplyLeading: false,
-        // shape: const RoundedRectangleBorder(
-        //   borderRadius: BorderRadius.vertical(
-        //     bottom: Radius.circular(30),
-        //   ),
-        // ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: myindex,
-        //unselectedItemColor: darkModeProvider.isDarkModeEnabled ? const Color(0xFFFFFFFF) : const Color(0xFFFFFFFF),
-        //selectedItemColor: const Color(0xFFA500),
-
         type: BottomNavigationBarType.shifting,
         onTap: (index) {
           setState(() {
@@ -93,7 +86,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      //body: Container(),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -107,9 +99,8 @@ class _HomePageState extends State<HomePage> {
                   FutureBuilder<String?>(
                     future: getProfilePictureUrl(),
                     builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
+                      if (snapshot.connectionState ==
+                          ConnectionState.waiting) {}
                       if (snapshot.hasData) {
                         final profilePictureUrl = snapshot.data!;
                         final currentUser = FirebaseAuth.instance.currentUser;
@@ -119,50 +110,59 @@ class _HomePageState extends State<HomePage> {
                             CircleAvatar(
                               radius: 55,
                               backgroundImage: NetworkImage(profilePictureUrl),
-                          // child: Image.network(
-                              //   profilePictureUrl,
-                              //   fit: BoxFit.cover,
-                             //  ),
                             ),
-                            SizedBox(height: 7,),
-                            Text(currentUser!.email.toString(),style: TextStyle(color: Colors.white),),
+                            SizedBox(
+                              height: 7,
+                            ),
+                            Text(
+                              currentUser!.email.toString(),
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ],
                         );
                       }
-                      return const SizedBox(); // Use a default image or placeholder here
+                      return const Image(
+                        image: AssetImage('assets/Images/karyana_rev.png'),
+                        width: 160,
+                      );
                     },
                   ),
-
                 ],
               ),
-
             ),
-
             ListTile(
               title: const Text('Edit Profile'),
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const EnterUserDataScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const EnterUserDataScreen()),
                 );
               },
             ),
             ListTile(
               title: const Text('Transaction History'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (ctx)=>const TransactionsHistory()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (ctx) => const TransactionsHistory()));
               },
             ),
             ListTile(
               title: const Text('Change Password'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (ctx)=>const ChangePasswordScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (ctx) => const ChangePasswordScreen()));
               },
             ),
             ListTile(
               title: const Text('Give Feedback'),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (ctx)=>const FeedbackPage()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (ctx) => const FeedbackPage()));
               },
             ),
             ListTile(
@@ -182,111 +182,24 @@ class _HomePageState extends State<HomePage> {
                 await prefs.setBool('isLoggedIn', false);
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) =>  MyApp()),
+                  MaterialPageRoute(builder: (context) => MyApp()),
                 );
               },
             ),
-            //
           ],
         ),
       ),
       body: myindex == 0
           ? const Profile()
           : myindex == 1
-          ? FavoritesPage()
-          : myindex == 2
-          ? ProductListPage()
-          : myindex == 3
-          ? CartPage(cart:mycart)
-          : null,
+              ? FavoritesPage()
+              : myindex == 2
+                  ? ProductListPage()
+                  : myindex == 3
+                      ? CartPage(cart: mycart)
+                      : null,
     );
   }
 }
+
 final Cart mycart = Cart();
-
-
-
-
-
-///////////////////////Without BurgerMenu AppDrawer/////////////////////////
-// import 'package:flutter/material.dart';
-// import 'categories.dart';
-// import 'profile.dart';
-// import 'cart.dart';
-// import 'favorites.dart';
-//
-// class HomePage extends StatefulWidget{
-//   const HomePage({Key? key}) : super(key: key);
-//
-//   @override
-//   State<HomePage> createState() => _HomePageState();
-// }
-//
-// class _HomePageState extends State<HomePage> {
-//   int myindex = 2;
-//
-//   @override
-//   Widget build(BuildContext context){
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('K A R Y A N A', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,),),
-//         centerTitle: true,
-//         toolbarHeight:45,
-//         automaticallyImplyLeading: false,
-//         shape: const RoundedRectangleBorder(
-//           borderRadius: BorderRadius.vertical(
-//             bottom: Radius.circular(30),
-//           ),
-//         ),
-//       ),
-//
-//       bottomNavigationBar: BottomNavigationBar(
-//         currentIndex: myindex,
-//         selectedItemColor: const Color(0xFF333652),
-//         unselectedItemColor: const Color(0xff000000),
-//         type: BottomNavigationBarType.shifting,
-//         onTap: (index){
-//           setState(() {
-//             myindex = index;
-//           });
-//         },
-//         items: const [
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.person_outline_rounded),
-//             activeIcon: Icon(Icons.person_rounded),
-//             label: 'Profile',
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.favorite_border_outlined),
-//             activeIcon: Icon(Icons.favorite),
-//             label: 'Favorites',
-//           ),
-//           BottomNavigationBarItem(
-//             label:'Explore',
-//             icon: Icon(Icons.search_outlined),
-//             activeIcon: Icon(Icons.search),
-//           ),
-//           BottomNavigationBarItem(
-//             icon: Icon(Icons.shopping_bag_outlined),
-//             activeIcon: Icon(Icons.shopping_bag),
-//             label: 'Cart',
-//           ),
-//         ],
-//       ),
-//       body: myindex == 0
-//           ? const Profile()
-//           : myindex == 1
-//           ? FavoritesPage()
-//           : myindex == 2
-//           ? ProductListPage()
-//           : myindex == 3
-//           ? CartPage(cart:mycart)
-//           : null,
-//     );
-//   }
-// }
-// final Cart mycart = Cart();
-
-
-
-

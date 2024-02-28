@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
 import 'main.dart';
 
 class Feedback {
@@ -70,11 +71,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
       feedbackList.add(feedback);
     });
 
-    final feedbackStrings = feedbackList.map((feedback) => '- ${feedback.feedback}\n ').toList();
+    final feedbackStrings =
+        feedbackList.map((feedback) => '- ${feedback.feedback}\n ').toList();
     final feedbackMessage = feedbackStrings.join('\n');
     showSnackbar(context, 'Your Feedback is ${feedbackMessage}');
   }
-
 
   void _submitFeedback() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -89,7 +90,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
       return;
     }
 
-
     final feedback = Feedback(
       feedback: feedbackText,
       user: user.uid,
@@ -97,7 +97,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
     try {
       final reference =
-      FirebaseDatabase.instance.ref().child('feedback').push();
+          FirebaseDatabase.instance.ref().child('feedback').push();
       await reference.set(feedback.toJson());
       showSnackbar(context, 'Feedback submitted!');
     } catch (e) {
@@ -119,10 +119,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
             const SizedBox(height: 16),
             const Text(
               'Feedback',
-              style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            SizedBox(width: 250,
+            SizedBox(
+              width: 250,
               child: TextField(
                 controller: _feedbackController,
                 maxLines: null,
@@ -132,17 +133,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _submitFeedback,
               child: const Text('Submit Feedback'),
             ),
-            // const SizedBox(height:20),
-            // ElevatedButton(
-            //   onPressed:(){ _displayFeedback(context);},
-            //   child: const Text('Display Feedback'),
-            // ),
           ],
         ),
       ),

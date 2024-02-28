@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:karyana/main.dart';
+
+import 'cart.dart';
 import 'categories.dart';
 import 'favorites.dart';
-import 'cart.dart';
 
 class ProductDetailsPage extends StatelessWidget {
   final Product product;
@@ -28,12 +29,8 @@ class ProductDetailsPage extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        //elevation: 0,
-        //backgroundColor: Colors.blueGrey[900],
       ),
-
       body: Container(
-        //color: Colors.black87, // Dark background color
         padding: const EdgeInsets.all(16.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +48,7 @@ class ProductDetailsPage extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFC49000), // Glow-in-the-dark gold color
+                        color: Color(0xFFC49000),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -59,7 +56,6 @@ class ProductDetailsPage extends StatelessWidget {
                       product.category,
                       style: const TextStyle(
                         fontSize: 18,
-                        //color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -67,7 +63,6 @@ class ProductDetailsPage extends StatelessWidget {
                       product.pdesc,
                       style: const TextStyle(
                         fontSize: 16,
-                        //color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -75,7 +70,6 @@ class ProductDetailsPage extends StatelessWidget {
                       'Quantity: ${product.stockQnt}',
                       style: const TextStyle(
                         fontSize: 16,
-                        //color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -83,7 +77,6 @@ class ProductDetailsPage extends StatelessWidget {
                       'Price: ${product.price}',
                       style: const TextStyle(
                         fontSize: 16,
-                        //color: Colors.white,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -91,7 +84,6 @@ class ProductDetailsPage extends StatelessWidget {
                       'Sold: ${product.sold}',
                       style: const TextStyle(
                         fontSize: 16,
-                        //color: Colors.white,
                       ),
                     ),
                   ],
@@ -142,7 +134,8 @@ class ProductDetailsPage extends StatelessWidget {
               if (product.stockQnt == 0) {
                 showSnackbar(context, 'Out of Stock');
               } else {
-                final CollectionReference _collectionReference = FirebaseFirestore.instance.collection('products');
+                final CollectionReference _collectionReference =
+                    FirebaseFirestore.instance.collection('products');
                 _collectionReference.doc(product.id).update({
                   'Stock qnt': product.stockQnt - 1,
                 });
