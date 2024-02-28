@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'main.dart';
+import 'homepage.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({Key? key}) : super(key: key);
@@ -33,7 +36,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Email Successfully Verified")));
       timer?.cancel();
-      Navigator.pop(context);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setBool('isLoggedIn', true);
+      showSnackbar(context, 'User is signed in!');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx)=>const HomePage()));
     }
   }
 
@@ -48,7 +54,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: getBackground(context),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -78,7 +84,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), backgroundColor: Colors.grey,)),
+              const Center(child: CircularProgressIndicator(
+              //  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue), backgroundColor: Colors.grey,
+              )),
               const SizedBox(height: 8),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32.0),
