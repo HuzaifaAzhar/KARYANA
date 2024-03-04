@@ -75,6 +75,6 @@ Thanks to all contributors and their support:
 
 ## Copyright and license
 
-Code and documentation copyright 2023 the authors. Code released under the [GNU 3](https://github.com/technocrats-portfolio/KARYANA/blob/main/README.md).
+Code and documentation copyright 2024 the creators. Code released under the [GNU 3](https://github.com/technocrats-portfolio/KARYANA/blob/main/README.md).
 
 Enjoy :metal:
